@@ -1,9 +1,5 @@
 package services
 
-import (
-
-)
-
-type Users interface{
-	Add()(int, error)
+type UsersService interface {
+	Add(user *User) error
 }
