@@ -1,5 +1,6 @@
 package errors
 
+// не вижу использования
 type UserValidate struct {
 	err     error
 	Message string

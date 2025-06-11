@@ -1,4 +1,4 @@
-module github.com/wolf1848/gotaxi
+module gotaxi
 
 go 1.23.0
 
