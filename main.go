@@ -9,10 +9,10 @@ import (
 
 func main() {
 	// Инициализация БД
-	if err := db.InitDB(); err != nil {
+	if err := db.InitPG(); err != nil {
 		log.Fatalf("Database initialization failed: %v", err)
 	}
-	defer db.CloseDB()
+	defer db.ClosePG()
 
 	//Инициализация веб севера
 	routes.ServerInit()

@@ -11,6 +11,10 @@ import (
 	"github.com/wolf1848/gotaxi/routes/dto"
 	"github.com/wolf1848/gotaxi/routes/errors"
 	"github.com/wolf1848/gotaxi/services"
+	"github.com/wolf1848/gotaxi/config"
+
+	"database/sql"
+    _ "github.com/go-sql-driver/mysql"
 )
 
 type CustomValidator struct {
@@ -33,8 +37,37 @@ func ServerInit() {
 
 	// Роуты
 	e.POST("/users/create", CreateUserHandler)
+	e.GET("/test", TestMysql)
 
 	e.Logger.Fatal(e.Start(":8080"))
+}
+
+func TestMysql(c echo.Context) error {
+
+	db, err := sql.Open("mysql", config.GetDBConnectionString("mysql"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT id, name FROM b_user LIMIT 10")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	var id int
+	var name string
+
+	for rows.Next() {
+		err := rows.Scan(&id, &name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("ID: %d, Name: %s\n", id, name)
+	}
+
+	return c.JSON(http.StatusCreated, map[string]string{"test": "route test"})
 }
 
 func dtoToModel(d *dto.User) *services.User {

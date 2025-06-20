@@ -10,14 +10,24 @@ import (
 	"github.com/wolf1848/gotaxi/config"
 )
 
-var Pool *pgxpool.Pool
+func initPG(c *config.Config) (*pgxpool.Pool, error) {
 
-func InitDB() error {
-	connStr := config.GetDBConnectionString()
+	var pool *pgxpool.Pool
+
+	connStr := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		c.Database.Postgres.Host,
+		c.Database.Postgres.Port,
+		c.Database.Postgres.User,
+		c.Database.Postgres.Password,
+		c.Database.Postgres.Dbname,
+		c.Database.Postgres.Ssl,
+	)
 
 	cfg, err := pgxpool.ParseConfig(connStr)
 	if err != nil {
-		return fmt.Errorf("failed to parse db config: %w", err)
+		log.Fatalf("Failed to parse db config: %s", err)
+		return nil, err
 	}
 
 	// Настройки пула соединений
@@ -29,22 +39,25 @@ func InitDB() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	Pool, err = pgxpool.NewWithConfig(ctx, cfg)
+	pool, err = pgxpool.NewWithConfig(ctx, cfg)
 	if err != nil {
-		return fmt.Errorf("failed to create connection pool: %w", err)
+		log.Fatalf("Failed to create connection pool: %s", err)
+		return nil, err
 	}
 
 	// Проверка соединения
-	if err := Pool.Ping(ctx); err != nil {
-		return fmt.Errorf("failed to ping database: %w", err)
+	if err := pool.Ping(ctx); err != nil {
+		log.Fatalf("Failed to ping database: %s", err)
+		return nil, err
 	}
 
 	log.Println("Successfully connected to PostgreSQL")
-	return nil
+
+	return pool, nil
 }
 
-func CloseDB() {
-	if Pool != nil {
-		Pool.Close()
+func closePG(p *pgxpool.Pool) {
+	if p != nil {
+		p.Close()
 	}
 }
