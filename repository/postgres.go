@@ -10,7 +10,7 @@ import (
 	"github.com/wolf1848/gotaxi/config"
 )
 
-func initPG(c *config.Config) (*pgxpool.Pool, error) {
+func InitPG(c *config.Config) (*pgxpool.Pool, error) {
 
 	var pool *pgxpool.Pool
 
@@ -56,7 +56,7 @@ func initPG(c *config.Config) (*pgxpool.Pool, error) {
 	return pool, nil
 }
 
-func closePG(p *pgxpool.Pool) {
+func ClosePG(p *pgxpool.Pool) {
 	if p != nil {
 		p.Close()
 	}
