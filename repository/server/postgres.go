@@ -1,4 +1,4 @@
-package repository
+package server
 
 import (
 	"context"
@@ -10,12 +10,12 @@ import (
 	"github.com/wolf1848/gotaxi/config"
 )
 
-func InitPG(c *config.Config) (*pgxpool.Pool, error) {
+func InitDB(c *config.Config) (*pgxpool.Pool, error) {
 
 	var pool *pgxpool.Pool
 
 	connStr := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
 		c.Database.Postgres.Host,
 		c.Database.Postgres.Port,
 		c.Database.Postgres.User,
@@ -56,7 +56,7 @@ func InitPG(c *config.Config) (*pgxpool.Pool, error) {
 	return pool, nil
 }
 
-func ClosePG(p *pgxpool.Pool) {
+func Close(p *pgxpool.Pool) {
 	if p != nil {
 		p.Close()
 	}

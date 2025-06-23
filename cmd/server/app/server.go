@@ -4,28 +4,32 @@ import (
 	"log"
 
 	"github.com/wolf1848/gotaxi/config"
-	"github.com/wolf1848/gotaxi/repository"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jackc/pgx/v5/pgxpool"
+	repo "github.com/wolf1848/gotaxi/repository/server"
 )
 
 func Run() {
 
 	conf, err := config.Init()
 	if err != nil {
-		panic("AAAAAA")
+		panic("Not config file!")
 	}
 
-	postgres, err := repository.InitPG(conf)
+	postgres, err := repo.InitDB(conf)
 	if err != nil {
-		panic("AAAAAAA DATABASE")
+		panic("Databse not connection")
 	}
-	defer repository.ClosePG(postgres)
+	defer repo.Close(postgres)
 
-	mysql, err := repository.InitMysql(c)
+	repository := repo.InitRepo(postgres)
 
-	repository.InitRepo(conf)
+	//userID, err := repository.User.Insert(&repo.User{Name: "test", Email: "test@mail.ru", Password: "hash"})
 
-	log.Print(conf.Database.Mysql.Password)
+	log.Println(err)
+
+	user, err := repository.User.GetUserId(1)
+
+	log.Println(err)
+
+	log.Println(user.Name)
 
 }
